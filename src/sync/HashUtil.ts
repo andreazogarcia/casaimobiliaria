@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { Imovel } from "../domain/Imovel";
+import { Imovel } from "../domain/Imovel.js";
 
 /**
  * Gera um hash determinístico do conteúdo "relevante" de um imóvel —

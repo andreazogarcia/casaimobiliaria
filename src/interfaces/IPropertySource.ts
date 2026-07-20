@@ -1,4 +1,4 @@
-import { Imovel } from "../domain/Imovel";
+import { Imovel } from "../domain/Imovel.js";
 
 /**
  * Contrato que qualquer origem de imóveis precisa cumprir.

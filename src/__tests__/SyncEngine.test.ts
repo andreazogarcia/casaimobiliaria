@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { SyncEngine } from "../sync/SyncEngine";
-import { InMemorySyncStore } from "../storage/InMemorySyncStore";
-import { OlxConnectorMock } from "../connectors/olx/OlxConnector.mock";
-import { WordPressConnectorMock, criarImovelDeExemplo } from "../connectors/wordpress/WordPressConnector.mock";
-import { ILogger } from "../interfaces/ILogger";
+import { SyncEngine } from "../sync/SyncEngine.js";
+import { InMemorySyncStore } from "../storage/InMemorySyncStore.js";
+import { OlxConnectorMock } from "../connectors/olx/OlxConnector.mock.js";
+import { WordPressConnectorMock, criarImovelDeExemplo } from "../connectors/wordpress/WordPressConnector.mock.js";
+import { ILogger } from "../interfaces/ILogger.js";
 
 const loggerSilencioso: ILogger = { info: () => {}, warn: () => {}, error: () => {} };
 

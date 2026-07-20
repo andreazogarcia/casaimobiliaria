@@ -1,4 +1,4 @@
-import { Imovel } from "../domain/Imovel";
+import { Imovel } from "../domain/Imovel.js";
 
 /** Resultado de uma operação de publicação/atualização/remoção no destino. */
 export interface ResultadoPublicacao {

@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { OlxOAuthClient } from "../../src/connectors/olx/OlxOAuthClient";
-import { ConsoleLogger } from "../../src/logging/ConsoleLogger";
-import { env } from "../../src/config/env";
+import { OlxOAuthClient } from "../../src/connectors/olx/OlxOAuthClient.js";
+import { ConsoleLogger } from "../../src/logging/ConsoleLogger.js";
+import { env } from "../../src/config/env.js";
 
 /**
  * GET /api/oauth/authorize

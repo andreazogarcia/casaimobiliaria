@@ -1,6 +1,6 @@
-import { IPropertySource } from "../../interfaces/IPropertySource";
-import { Imovel, TipoImovel, FinalidadeImovel } from "../../domain/Imovel";
-import { ILogger } from "../../interfaces/ILogger";
+import { IPropertySource } from "../../interfaces/IPropertySource.js";
+import { Imovel, TipoImovel, FinalidadeImovel } from "../../domain/Imovel.js";
+import { ILogger } from "../../interfaces/ILogger.js";
 
 export interface WordPressConnectorConfig {
   /** Ex: https://casaimobiliariaes.com.br/wp-json */

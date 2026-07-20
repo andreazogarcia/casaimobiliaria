@@ -1,7 +1,7 @@
-import { IPropertyDestination, ResultadoPublicacao } from "../../interfaces/IPropertyDestination";
-import { Imovel } from "../../domain/Imovel";
-import { OlxOAuthClient } from "./OlxOAuthClient";
-import { ILogger } from "../../interfaces/ILogger";
+import { IPropertyDestination, ResultadoPublicacao } from "../../interfaces/IPropertyDestination.js";
+import { Imovel } from "../../domain/Imovel.js";
+import { OlxOAuthClient } from "./OlxOAuthClient.js";
+import { ILogger } from "../../interfaces/ILogger.js";
 
 const IMPORT_URL = "https://apps.olx.com.br/autoupload/import";
 

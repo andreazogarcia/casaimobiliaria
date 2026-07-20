@@ -1,9 +1,9 @@
-import { IPropertySource } from "../interfaces/IPropertySource";
-import { IPropertyDestination } from "../interfaces/IPropertyDestination";
-import { ISyncStore } from "../interfaces/ISyncStore";
-import { ILogger } from "../interfaces/ILogger";
-import { calcularHashImovel } from "./HashUtil";
-import { DecisaoSincronizacao } from "../domain/Imovel";
+import { IPropertySource } from "../interfaces/IPropertySource.js";
+import { IPropertyDestination } from "../interfaces/IPropertyDestination.js";
+import { ISyncStore } from "../interfaces/ISyncStore.js";
+import { ILogger } from "../interfaces/ILogger.js";
+import { calcularHashImovel } from "./HashUtil.js";
+import { DecisaoSincronizacao } from "../domain/Imovel.js";
 
 export interface ResultadoCicloSync {
   totalNaOrigem: number;

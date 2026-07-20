@@ -1,5 +1,5 @@
-import { IPropertySource } from "../../interfaces/IPropertySource";
-import { Imovel } from "../../domain/Imovel";
+import { IPropertySource } from "../../interfaces/IPropertySource.js";
+import { Imovel } from "../../domain/Imovel.js";
 
 /** Mock da origem — usado em testes e no desenvolvimento enquanto não temos credenciais reais do WP. */
 export class WordPressConnectorMock implements IPropertySource {

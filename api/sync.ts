@@ -1,11 +1,11 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { SyncEngine } from "../src/sync/SyncEngine";
-import { WordPressConnector } from "../src/connectors/wordpress/WordPressConnector";
-import { OlxConnector } from "../src/connectors/olx/OlxConnector";
-import { OlxOAuthClient } from "../src/connectors/olx/OlxOAuthClient";
-import { InMemorySyncStore } from "../src/storage/InMemorySyncStore";
-import { ConsoleLogger } from "../src/logging/ConsoleLogger";
-import { env } from "../src/config/env";
+import { SyncEngine } from "../src/sync/SyncEngine.js";
+import { WordPressConnector } from "../src/connectors/wordpress/WordPressConnector.js";
+import { OlxConnector } from "../src/connectors/olx/OlxConnector.js";
+import { OlxOAuthClient } from "../src/connectors/olx/OlxOAuthClient.js";
+import { InMemorySyncStore } from "../src/storage/InMemorySyncStore.js";
+import { ConsoleLogger } from "../src/logging/ConsoleLogger.js";
+import { env } from "../src/config/env.js";
 
 /**
  * GET /api/sync

@@ -1,5 +1,5 @@
-import { IPropertyDestination, ResultadoPublicacao } from "../../interfaces/IPropertyDestination";
-import { Imovel } from "../../domain/Imovel";
+import { IPropertyDestination, ResultadoPublicacao } from "../../interfaces/IPropertyDestination.js";
+import { Imovel } from "../../domain/Imovel.js";
 
 /** Mock do destino — usado em testes e no desenvolvimento enquanto não temos credenciais reais da OLX. */
 export class OlxConnectorMock implements IPropertyDestination {

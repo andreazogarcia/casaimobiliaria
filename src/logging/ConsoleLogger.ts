@@ -1,4 +1,4 @@
-import { ILogger } from "../interfaces/ILogger";
+import { ILogger } from "../interfaces/ILogger.js";
 
 /**
  * Logger estruturado simples, em JSON por linha — formato fácil de

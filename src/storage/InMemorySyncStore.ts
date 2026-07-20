@@ -1,4 +1,4 @@
-import { ISyncStore, RegistroSync } from "../interfaces/ISyncStore";
+import { ISyncStore, RegistroSync } from "../interfaces/ISyncStore.js";
 
 /**
  * Implementação em memória de ISyncStore — usada em testes e no
