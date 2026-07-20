@@ -24,15 +24,15 @@ import { env } from "../src/config/env";
  * Por ora, isso serve para validar o fluxo ponta a ponta.
  */
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
-  const segredoRecebido = req.headers.authorization?.replace("Bearer ", "");
-  if (segredoRecebido !== env.cronSecret) {
-    res.status(401).json({ erro: "Não autorizado" });
-    return;
-  }
-
   const logger = new ConsoleLogger();
 
   try {
+    const segredoRecebido = req.headers.authorization?.replace("Bearer ", "");
+    if (segredoRecebido !== env.cronSecret) {
+      res.status(401).json({ erro: "Não autorizado" });
+      return;
+    }
+
     const origem = new WordPressConnector(
       {
         apiUrl: env.wordpress.apiUrl,

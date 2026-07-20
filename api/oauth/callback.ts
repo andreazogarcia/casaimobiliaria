@@ -26,12 +26,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
 
-  const oauth = new OlxOAuthClient(
-    { clientId: env.olx.clientId, clientSecret: env.olx.clientSecret, redirectUri: env.olx.redirectUri },
-    logger
-  );
-
   try {
+    const oauth = new OlxOAuthClient(
+      { clientId: env.olx.clientId, clientSecret: env.olx.clientSecret, redirectUri: env.olx.redirectUri },
+      logger
+    );
+
     const accessToken = await oauth.trocarCodigoPorToken(code);
     res
       .status(200)
