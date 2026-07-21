@@ -10,7 +10,9 @@
     "build": "tsc --noEmit",
     "dev": "vercel dev"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  },
   "devDependencies": {
     "@types/node": "^22.10.0",
     "@vercel/node": "^3.2.0",
