@@ -17,9 +17,11 @@ export interface WordPressConnectorConfig {
 }
 
 /**
- * IDs dos campos e taxonomias do Listivo, confirmados comparando 3 imóveis
- * reais (`GET /wp-json/wp/v2/listings`, imóveis #20444, #20406, #20370),
- * cruzando os valores dos campos com o texto das descrições de cada um.
+ * IDs dos campos e taxonomias do Listivo — confirmados em duas etapas:
+ * primeiro por comparação cruzada de 3 imóveis reais com o texto das
+ * descrições, depois com CONFIRMAÇÃO DEFINITIVA vendo os rótulos de
+ * verdade na tela de edição do /wp-admin (todas as suposições anteriores
+ * bateram certo com os rótulos reais).
  *
  * O Listivo expõe cada campo customizado como uma chave própria no JSON
  * do post, no formato `listivo_<id>` — tanto taxonomias (categorias,
@@ -28,38 +30,29 @@ export interface WordPressConnectorConfig {
  * do outro pela lista `taxonomies` do post type (ver `/wp-json/wp/v2/types`).
  *
  * CONFIRMADO (taxonomias, valores já vêm como texto legível no JSON):
- * - listivo_14   -> Tipo de imóvel (ex: "Apartamento", "Apartamento garden")
- * - listivo_9031 -> Finalidade ("Locação" ou "Venda")
+ * - listivo_14   -> Categoria / Tipo de imóvel (ex: "Apartamento", "Apartamento padrão")
+ * - listivo_9031 -> Modalidade ("Locação" ou "Venda")
  * - listivo_9239 -> Cidade (ex: "Serra")
- * - listivo_9238 -> Bairro (ex: "Porto Canoa")
- * - listivo_4661 -> Comodidades do imóvel (lista)
- * - listivo_8987 -> Comodidades do condomínio (lista)
+ * - listivo_9238 -> Bairro (ex: "Morada de Laranjeiras")
+ * - listivo_4661 -> Comodidades do Imóvel (lista)
+ * - listivo_8987 -> Comodidades do Condomínio (lista)
  *
- * CONFIRMADO (campos, não-taxonomia), por comparação cruzada com a
- * descrição em texto livre de 3 imóveis diferentes:
+ * CONFIRMADO (campos, não-taxonomia) — rótulos vistos direto na tela de
+ * edição do /wp-admin:
  * - listivo_145  -> galeria de fotos (array de URLs, já prontas para uso)
- * - listivo_130  -> preço, como texto formatado (ex: "R$2.400,00")
- * - listivo_338  -> quartos (bateu exato nos 3 imóveis: 2, 2, 3)
- * - listivo_8984 -> suítes (bateu exato nos 3 imóveis: 1, vazio, 1)
- * - listivo_339  -> banheiros, incluindo os de suíte (bateu exato em 2 dos
- *   3 — a terceira divergência é uma inconsistência entre o texto livre
- *   escrito pelo corretor e o campo estruturado, não um erro de mapeamento)
- * - listivo_8985 -> vagas de garagem (bateu nos 3: os imóveis sem menção
- *   a vaga no texto tinham valor 1 — padrão em apartamento, tão comum que
- *   o corretor não menciona — e o único com "2 vagas" destacado no texto
- *   tinha valor 2)
- * - listivo_340  -> área, como texto formatado (ex: "124m²"). Bate exato
- *   com o texto quando presente, mas fica vazio em pelo menos 1 imóvel —
- *   usar `listivo_8983` como fallback nesse caso (ver nota abaixo)
+ * - listivo_130  -> Preço, como texto formatado (ex: "R$2.400,00")
+ * - listivo_338  -> Quartos
+ * - listivo_8984 -> Suítes
+ * - listivo_339  -> Banheiros
+ * - listivo_9255 -> Lavabo (banheiro de visitas sem chuveiro — por isso
+ *   costuma vir vazio na maioria dos imóveis, o que tinha dificultado
+ *   identificar esse campo antes)
+ * - listivo_8985 -> Garagem (vagas)
+ * - listivo_340  -> Área total, como texto formatado (ex: "124m²")
+ * - listivo_8983 -> Área construída, como texto formatado
  *
- * AINDA EM ABERTO:
- * - listivo_8983 -> parece ser uma segunda medida de área (possivelmente
- *   área total/construída vs. `listivo_340` como área privativa/útil),
- *   mas em 1 dos 3 imóveis o valor é MENOR que o de listivo_340, o que
- *   quebraria essa hipótese (área construída deveria ser ≥ área privativa).
- *   Por ora, uso como fallback apenas quando listivo_340 vier vazio.
- * - listivo_9255 -> vazio nos 3 imóveis testados, sem nenhuma pista ainda
- *   sobre o que representa. Não mapeado.
+ * Não mapeados no modelo de domínio por não terem uso previsto no envio
+ * para a OLX (mas podem ser adicionados depois se precisar): Lavabo.
  */
 const CAMPO = {
   TIPO: "listivo_14",

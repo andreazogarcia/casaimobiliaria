@@ -3,7 +3,7 @@ import { SyncEngine } from "../src/sync/SyncEngine.js";
 import { WordPressConnector } from "../src/connectors/wordpress/WordPressConnector.js";
 import { OlxConnector } from "../src/connectors/olx/OlxConnector.js";
 import { OlxOAuthClient } from "../src/connectors/olx/OlxOAuthClient.js";
-import { InMemorySyncStore } from "../src/storage/InMemorySyncStore.js";
+import { SupabaseSyncStore } from "../src/storage/SupabaseSyncStore.js";
 import { ConsoleLogger } from "../src/logging/ConsoleLogger.js";
 import { env } from "../src/config/env.js";
 
@@ -18,10 +18,10 @@ import { env } from "../src/config/env.js";
  * Protegida por um header de autorização simples para que só o
  * scheduler configurado consiga disparar o ciclo.
  *
- * ATENÇÃO: usa InMemorySyncStore, que NÃO persiste entre execuções
- * serverless. Antes de considerar isso pronto para produção, trocar por
- * uma implementação de ISyncStore com banco persistente (ex: Postgres).
- * Por ora, isso serve para validar o fluxo ponta a ponta.
+ * Usa SupabaseSyncStore como store de sincronização, que persiste entre
+ * execuções serverless (ao contrário da InMemorySyncStore, usada só em
+ * dev/testes) — necessário para o Hub saber o que já foi sincronizado
+ * antes, mesmo rodando em uma função nova a cada chamada.
  */
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   const logger = new ConsoleLogger();
@@ -50,8 +50,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     );
     const destino = new OlxConnector(oauth, logger);
 
-    // TODO: trocar pela implementação persistente antes de produção real.
-    const store = new InMemorySyncStore();
+    const store = new SupabaseSyncStore(env.supabase.url, env.supabase.serviceRoleKey);
 
     const engine = new SyncEngine(origem, destino, store, logger);
     const resultado = await engine.executarCiclo();

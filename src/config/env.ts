@@ -41,4 +41,12 @@ export const env = {
   get cronSecret() {
     return obrigatoria("CRON_SECRET");
   },
+  get supabase() {
+    return {
+      url: obrigatoria("SUPABASE_URL"),
+      // Service role key: acessa a tabela ignorando Row Level Security.
+      // Só pode ser usada aqui no backend, NUNCA em código de frontend.
+      serviceRoleKey: obrigatoria("SUPABASE_SERVICE_ROLE_KEY"),
+    };
+  },
 };
