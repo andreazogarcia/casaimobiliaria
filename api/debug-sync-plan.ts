@@ -5,6 +5,7 @@ import { OlxConnectorMock } from "../src/connectors/olx/OlxConnector.mock.js";
 import { SupabaseSyncStore } from "../src/storage/SupabaseSyncStore.js";
 import { ConsoleLogger } from "../src/logging/ConsoleLogger.js";
 import { env } from "../src/config/env.js";
+import { descreverErro } from "../src/util/erros.js";
 
 /**
  * GET /api/debug-sync-plan
@@ -65,7 +66,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
       amostraCriar: decisoes.filter((d) => d.acao === "criar").slice(0, 3).map((d) => d.imovel.titulo),
     });
   } catch (erro) {
-    const mensagem = erro instanceof Error ? erro.message : String(erro);
+    const mensagem = descreverErro(erro);
     logger.error("Falha no diagnóstico WordPress + Supabase", { mensagem });
     res.status(500).json({ erro: mensagem });
   }

@@ -4,6 +4,7 @@ import { ISyncStore } from "../interfaces/ISyncStore.js";
 import { ILogger } from "../interfaces/ILogger.js";
 import { calcularHashImovel } from "./HashUtil.js";
 import { DecisaoSincronizacao } from "../domain/Imovel.js";
+import { descreverErro } from "../util/erros.js";
 
 export interface ItemProcessado {
   idOrigem: string;
@@ -122,7 +123,7 @@ export class SyncEngine {
       try {
         await this.executarDecisao(decisao, resultado);
       } catch (erro) {
-        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        const mensagem = descreverErro(erro);
         this.logger.error("Falha ao processar imóvel", { idOrigem: decisao.imovel.idOrigem, mensagem });
         resultado.erros.push({ idOrigem: decisao.imovel.idOrigem, mensagem });
         if (decisao.acao !== "sem_alteracao") {

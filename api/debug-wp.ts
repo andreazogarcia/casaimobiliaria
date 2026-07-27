@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { WordPressConnector } from "../src/connectors/wordpress/WordPressConnector.js";
 import { ConsoleLogger } from "../src/logging/ConsoleLogger.js";
 import { env } from "../src/config/env.js";
+import { descreverErro } from "../src/util/erros.js";
 
 /**
  * GET /api/debug-wp
@@ -42,7 +43,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
       primeiros3: imoveis.slice(0, 3),
     });
   } catch (erro) {
-    const mensagem = erro instanceof Error ? erro.message : String(erro);
+    const mensagem = descreverErro(erro);
     logger.error("Falha ao ler WordPress", { mensagem });
     res.status(500).json({ erro: mensagem });
   }

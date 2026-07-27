@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { OlxOAuthClient } from "../../src/connectors/olx/OlxOAuthClient.js";
 import { ConsoleLogger } from "../../src/logging/ConsoleLogger.js";
 import { env } from "../../src/config/env.js";
+import { descreverErro } from "../../src/util/erros.js";
 
 /**
  * GET /api/oauth/authorize
@@ -24,7 +25,7 @@ export default function handler(req: VercelRequest, res: VercelResponse): void {
     const urlAutorizacao = oauth.montarUrlAutorizacao(["autoupload"]);
     res.redirect(302, urlAutorizacao);
   } catch (erro) {
-    const mensagem = erro instanceof Error ? erro.message : String(erro);
+    const mensagem = descreverErro(erro);
     res.status(500).send(`Configuração ausente: ${mensagem}`);
   }
 }

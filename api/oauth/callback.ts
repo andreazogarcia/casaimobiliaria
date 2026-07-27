@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { OlxOAuthClient } from "../../src/connectors/olx/OlxOAuthClient.js";
 import { ConsoleLogger } from "../../src/logging/ConsoleLogger.js";
 import { env } from "../../src/config/env.js";
+import { descreverErro } from "../../src/util/erros.js";
 
 /**
  * GET /api/oauth/callback
@@ -39,7 +40,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
         `Autorização concluída. Copie o access_token abaixo e salve-o como variável de ambiente OLX_ACCESS_TOKEN:\n\n${accessToken}`
       );
   } catch (erro) {
-    const mensagem = erro instanceof Error ? erro.message : String(erro);
+    const mensagem = descreverErro(erro);
     logger.error("Falha ao trocar code por access_token", { mensagem });
     res.status(500).send(`Falha na autorização: ${mensagem}`);
   }

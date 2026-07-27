@@ -6,6 +6,7 @@ import { OlxOAuthClient } from "../src/connectors/olx/OlxOAuthClient.js";
 import { SupabaseSyncStore } from "../src/storage/SupabaseSyncStore.js";
 import { ConsoleLogger } from "../src/logging/ConsoleLogger.js";
 import { env } from "../src/config/env.js";
+import { descreverErro } from "../src/util/erros.js";
 
 /**
  * GET /api/sync
@@ -74,7 +75,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
 
     res.status(200).json(resultado);
   } catch (erro) {
-    const mensagem = erro instanceof Error ? erro.message : String(erro);
+    const mensagem = descreverErro(erro);
     logger.error("Falha no ciclo de sincronização", { mensagem });
     res.status(500).json({ erro: mensagem });
   }
