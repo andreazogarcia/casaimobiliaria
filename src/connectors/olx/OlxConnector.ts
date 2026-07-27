@@ -69,9 +69,12 @@ export class OlxConnector implements IPropertyDestination {
       return { sucesso: false, mensagemErro: `HTTP ${resposta.status} - ${corpo}` };
     }
 
-    const dados = (await resposta.json()) as { token?: string };
+    const dados = (await resposta.json()) as { token?: string; [chave: string]: unknown };
     if (!dados.token) {
-      return { sucesso: false, mensagemErro: "Resposta da OLX não retornou token de importação" };
+      return {
+        sucesso: false,
+        mensagemErro: `Resposta da OLX não retornou token de importação. Corpo da resposta: ${JSON.stringify(dados)}`,
+      };
     }
 
     // A importação é assíncrona: aqui só confirmamos que a OLX aceitou o
