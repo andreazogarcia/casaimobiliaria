@@ -22,6 +22,11 @@ import { env } from "../src/config/env.js";
  * execuções serverless (ao contrário da InMemorySyncStore, usada só em
  * dev/testes) — necessário para o Hub saber o que já foi sincronizado
  * antes, mesmo rodando em uma função nova a cada chamada.
+ *
+ * Aceita um parâmetro opcional `?limit=N` para limitar quantas mudanças
+ * (criar/atualizar/remover) são executadas de fato nesta chamada —
+ * recomendado para o primeiro teste real contra uma conta de produção,
+ * antes de rodar sem limite contra o catálogo inteiro.
  */
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   const logger = new ConsoleLogger();
@@ -53,7 +58,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     const store = new SupabaseSyncStore(env.supabase.url, env.supabase.serviceRoleKey);
 
     const engine = new SyncEngine(origem, destino, store, logger);
-    const resultado = await engine.executarCiclo();
+
+    // Trava de segurança: ?limit=N restringe quantas mudanças (criar/
+    // atualizar/remover) são executadas nesta chamada. Sem o parâmetro,
+    // processa tudo — use isso conscientemente, de preferência só depois
+    // de validar um lote pequeno primeiro (ex: /api/sync?limit=3).
+    const limiteParam = req.query.limit;
+    const limite = typeof limiteParam === "string" && limiteParam !== "" ? Number(limiteParam) : undefined;
+    if (limiteParam !== undefined && (limite === undefined || !Number.isFinite(limite) || limite < 0)) {
+      res.status(400).json({ erro: "Parâmetro 'limit' inválido — deve ser um número inteiro >= 0" });
+      return;
+    }
+
+    const resultado = await engine.executarCiclo(limite);
 
     res.status(200).json(resultado);
   } catch (erro) {

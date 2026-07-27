@@ -5,6 +5,16 @@ import { ILogger } from "../interfaces/ILogger.js";
 import { calcularHashImovel } from "./HashUtil.js";
 import { DecisaoSincronizacao } from "../domain/Imovel.js";
 
+export interface ItemProcessado {
+  idOrigem: string;
+  idDestino?: string;
+  titulo: string;
+  cidade: string;
+  bairro: string;
+  acao: Exclude<DecisaoSincronizacao["acao"], "sem_alteracao">;
+  sucesso: boolean;
+}
+
 export interface ResultadoCicloSync {
   totalNaOrigem: number;
   criados: number;
@@ -12,6 +22,14 @@ export interface ResultadoCicloSync {
   removidos: number;
   semAlteracao: number;
   erros: { idOrigem: string; mensagem: string }[];
+  /**
+   * Detalhe de cada imóvel efetivamente tocado neste ciclo (não inclui
+   * os "sem_alteracao") — pensado para conseguir identificar, na tela da
+   * OLX, exatamente quais anúncios foram publicados/atualizados/removidos
+   * nesta chamada específica, já que a OLX não expõe nenhuma marcação
+   * própria de "veio do Hub".
+   */
+  processados: ItemProcessado[];
 }
 
 /**
@@ -66,16 +84,38 @@ export class SyncEngine {
     return decisoes;
   }
 
-  /** Executa as decisões do ciclo, chamando o destino e atualizando o store. */
-  async executarCiclo(): Promise<ResultadoCicloSync> {
-    const decisoes = await this.planejarCiclo();
+  /**
+   * Executa as decisões do ciclo, chamando o destino e atualizando o store.
+   *
+   * @param limiteMudancas Trava de segurança opcional: limita quantas
+   * decisões de "criar"/"atualizar"/"remover" são de fato executadas
+   * nesta chamada (decisões "sem_alteracao" não contam pro limite, já
+   * que não fazem nenhuma chamada ao destino). Útil para o primeiro
+   * teste real contra uma conta de produção — evita publicar o catálogo
+   * inteiro de uma vez antes de confirmar que está tudo certo em uma
+   * amostra pequena. Sem limite, processa tudo.
+   */
+  async executarCiclo(limiteMudancas?: number): Promise<ResultadoCicloSync> {
+    const decisoesCompletas = await this.planejarCiclo();
+
+    let mudancasIncluidas = 0;
+    const decisoes = decisoesCompletas.filter((d) => {
+      if (d.acao === "sem_alteracao") return true;
+      if (limiteMudancas === undefined || mudancasIncluidas < limiteMudancas) {
+        mudancasIncluidas++;
+        return true;
+      }
+      return false;
+    });
+
     const resultado: ResultadoCicloSync = {
-      totalNaOrigem: decisoes.filter((d) => d.acao !== "remover").length,
+      totalNaOrigem: decisoesCompletas.filter((d) => d.acao !== "remover").length,
       criados: 0,
       atualizados: 0,
       removidos: 0,
       semAlteracao: 0,
       erros: [],
+      processados: [],
     };
 
     for (const decisao of decisoes) {
@@ -85,6 +125,16 @@ export class SyncEngine {
         const mensagem = erro instanceof Error ? erro.message : String(erro);
         this.logger.error("Falha ao processar imóvel", { idOrigem: decisao.imovel.idOrigem, mensagem });
         resultado.erros.push({ idOrigem: decisao.imovel.idOrigem, mensagem });
+        if (decisao.acao !== "sem_alteracao") {
+          resultado.processados.push({
+            idOrigem: decisao.imovel.idOrigem,
+            titulo: decisao.imovel.titulo ?? "(não disponível)",
+            cidade: decisao.imovel.endereco?.cidade ?? "",
+            bairro: decisao.imovel.endereco?.bairro ?? "",
+            acao: decisao.acao,
+            sucesso: false,
+          });
+        }
       }
     }
 
@@ -108,6 +158,15 @@ export class SyncEngine {
           ultimaSincronizacaoEm: new Date().toISOString(),
         });
         resultado.criados++;
+        resultado.processados.push({
+          idOrigem: imovel.idOrigem,
+          idDestino: resposta.idDestino,
+          titulo: imovel.titulo,
+          cidade: imovel.endereco.cidade,
+          bairro: imovel.endereco.bairro,
+          acao: "criar",
+          sucesso: true,
+        });
         this.logger.info("Imóvel publicado", { idOrigem: imovel.idOrigem, idDestino: resposta.idDestino });
         break;
       }
@@ -126,6 +185,15 @@ export class SyncEngine {
           ultimaSincronizacaoEm: new Date().toISOString(),
         });
         resultado.atualizados++;
+        resultado.processados.push({
+          idOrigem: imovel.idOrigem,
+          idDestino: registro.idDestino,
+          titulo: imovel.titulo,
+          cidade: imovel.endereco.cidade,
+          bairro: imovel.endereco.bairro,
+          acao: "atualizar",
+          sucesso: true,
+        });
         this.logger.info("Imóvel atualizado", { idOrigem: imovel.idOrigem, idDestino: registro.idDestino });
         break;
       }
@@ -140,6 +208,15 @@ export class SyncEngine {
         }
         await this.store.remover(imovel.idOrigem);
         resultado.removidos++;
+        resultado.processados.push({
+          idOrigem: imovel.idOrigem,
+          idDestino: registro.idDestino,
+          titulo: imovel.titulo ?? "(não disponível, imóvel já removido da origem)",
+          cidade: imovel.endereco?.cidade ?? "",
+          bairro: imovel.endereco?.bairro ?? "",
+          acao: "remover",
+          sucesso: true,
+        });
         this.logger.info("Imóvel removido", { idOrigem: imovel.idOrigem, idDestino: registro.idDestino });
         break;
       }
